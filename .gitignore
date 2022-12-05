@@ -10,3 +10,13 @@ Dd]ebug/
 x64/
 [Bb]in/
 [Oo]bj/
+
+# Rust
+debug/
+target/
+
+Cargo.lock
+
+**/*.rs.bk
+
+*.pdb
