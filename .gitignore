@@ -1,0 +1,12 @@
+# Python
+src/venv/
+.idea/
+secrets.json
+__pycache__/
+
+# .NET
+Dd]ebug/
+[Rr]elease/
+x64/
+[Bb]in/
+[Oo]bj/
