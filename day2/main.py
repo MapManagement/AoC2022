@@ -1,5 +1,5 @@
 def calculate_total_score():
-    with open ("input", "r") as input:
+    with open("input", "r") as input:
         total_score = 0
         lines = input.readlines()
         # A = rock, B = paper, C = scissors
