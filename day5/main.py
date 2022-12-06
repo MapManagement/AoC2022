@@ -7,7 +7,7 @@ class Move:
     dst: int
     number: int
 
-def solve_puzzle():
+def solve_puzzle(part_two: bool):
     with open("input", "r") as input:
         input_string = input.read()
      
@@ -18,11 +18,10 @@ def solve_puzzle():
 
         for splitted_move in splitted_moves:
             move = read_move(splitted_move)
-        
-            for _ in range(move.number):
-                container = stacks[move.src][0]
-                stacks[move.dst].insert(0, container) 
-                del stacks[move.src][0]
+            if part_two:
+                stacks = do_move_order(move, stacks)
+            else:
+                stacks = do_move_no_order(move, stacks)
 
         top_containers = get_top_containers(stacks)
 
@@ -58,6 +57,28 @@ def read_move(move: str) -> Move:
 
     return Move(src, dst, number)
 
+def do_move_no_order(move: Move, stacks: List[List[str]]) -> List[List[str]]:
+    for _ in range(move.number):
+        container = stacks[move.src][0]
+        stacks[move.dst].insert(0, container) 
+        del stacks[move.src][0]
+
+    return stacks
+
+
+def do_move_order(move: Move, stacks: List[List[str]]) -> List[List[str]]:
+    containers = []
+
+    for _ in range(move.number):
+        container = stacks[move.src][0]
+        containers.insert(0, container)
+        del stacks[move.src][0]
+
+    for container in containers:
+        stacks[move.dst].insert(0, container)
+
+    return stacks
+
 def get_top_containers(stacks: List[List[str]]) -> List[str]:
     top_containers = []
     for stack in stacks:
@@ -66,5 +87,5 @@ def get_top_containers(stacks: List[List[str]]) -> List[str]:
     return top_containers
 
 if __name__ == "__main__":
-    stacks = solve_puzzle()
+    stacks = solve_puzzle(True)
     print(stacks)
