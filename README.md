@@ -10,7 +10,10 @@ was learning it during that time.
 
 ## Puzzles
 
-- [Day 1](https://github.com/MapManagement/AoC2022/tree/master/day1) - Python - Completed
-- [Day 2](https://github.com/MapManagement/AoC2022/tree/master/day1) - Python - Completed
-- [Day 3](https://github.com/MapManagement/AoC2022/tree/master/day1) - C# - Completed
+- [Day 1](https://github.com/MapManagement/AoC2022/tree/master/day1) - Python - P1 :white_check_mark: - P2 :white_check_mark:
+- [Day 2](https://github.com/MapManagement/AoC2022/tree/master/day2) - Python - P1 :white_check_mark: - P2 :x:
+- [Day 3](https://github.com/MapManagement/AoC2022/tree/master/day3) - C# - P1 :white_check_mark: - P2 :x:
+- [Day 4](https://github.com/MapManagement/AoC2022/tree/master/day4) - Rust - P1 :white_check_mark: - P2 :x:
+- [Day 5](https://github.com/MapManagement/AoC2022/tree/master/day5) - Python - P1 :white_check_mark: - P2 :white_check_mark:
+- [Day 6](https://github.com/MapManagement/AoC2022/tree/master/day6) - Rust - P1 :white_check_mark: - P2 :white_check_mark:
 
