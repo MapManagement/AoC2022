@@ -16,4 +16,9 @@ was learning it during that time.
 - [Day 4](https://github.com/MapManagement/AoC2022/tree/master/day4) - Rust - P1 :white_check_mark: - P2 :x:
 - [Day 5](https://github.com/MapManagement/AoC2022/tree/master/day5) - Python - P1 :white_check_mark: - P2 :white_check_mark:
 - [Day 6](https://github.com/MapManagement/AoC2022/tree/master/day6) - Rust - P1 :white_check_mark: - P2 :white_check_mark:
+- Day 7 -
+- [Day 8](https://github.com/MapManagement/AoC2022/tree/master/day8) - Rust - P1 :white_check_mark: - P2 :x:
+- Day 9 -
+- [Day 10](https://github.com/MapManagement/AoC2022/tree/master/day10) - Rust - P1 :white_check_mark: - P2 :x:
+- Day 11
 
