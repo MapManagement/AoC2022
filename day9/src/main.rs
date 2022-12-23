@@ -65,102 +65,46 @@ fn part1() -> usize {
             }
 
             if head.x - tail.x > 1 {
-                if head.y - tail.y == 1 {
-                    tail.x += 1;
-                    tail.y += 1;
-                    if !all_tail_pos.contains(&tail) {
-                        all_tail_pos.push(tail.clone());
-                    }
-
-                    continue;
-                }
-                else if head.y - tail.y == -1  {
-                    tail.x += 1;
-                    tail.y -= 1;
-                    if !all_tail_pos.contains(&tail) {
-                        all_tail_pos.push(tail.clone());
-                    }
-
-                    continue;
-                }
-
                 tail.x += 1;
+                check_y_distance(&mut head, &mut tail);
             }
             else if head.x - tail.x < -1 {
-                if head.y - tail.y == 1 {
-                    tail.x -= 1;
-                    tail.y += 1;
-                    if !all_tail_pos.contains(&tail) {
-                        all_tail_pos.push(tail.clone());
-                    }
-
-                    continue;
-                }
-                else if head.y - tail.y == -1  {
-                    tail.x -= 1;
-                    tail.y -= 1;
-                    if !all_tail_pos.contains(&tail) {
-                        all_tail_pos.push(tail.clone());
-                    }
-
-                    continue;
-                }
-
                 tail.x -= 1;
+                check_y_distance(&mut head, &mut tail);
             }
 
             if head.y - tail.y > 1 {
-                if head.x - tail.x == 1 {
-                    tail.x += 1;
-                    tail.y += 1;
-                    if !all_tail_pos.contains(&tail) {
-                        all_tail_pos.push(tail.clone());
-                    }
-
-                    continue;
-                }
-                else if head.x - tail.x == -1  {
-                    tail.x -= 1;
-                    tail.y += 1;
-                    if !all_tail_pos.contains(&tail) {
-                        all_tail_pos.push(tail.clone());
-                    }
-
-                    continue;
-                }
-
                 tail.y += 1;
+                check_x_distance(&mut head, &mut tail);
             }
             else if head.y - tail.y < -1 {
-                if head.x - tail.x == 1 {
-                    tail.x += 1;
-                    tail.y -= 1;
-                    if !all_tail_pos.contains(&tail) {
-                        all_tail_pos.push(tail.clone());
-                    }
-
-                    continue;
-                }
-                else if head.x - tail.x == -1  {
-                    tail.x -= 1;
-                    tail.y -= 1;
-                    if !all_tail_pos.contains(&tail) {
-                        all_tail_pos.push(tail.clone());
-                    }
-
-                    continue;
-                }
-
                 tail.y -= 1;
+                check_x_distance(&mut head, &mut tail);
             }
 
-            if !all_tail_pos.contains(&tail) {
-                all_tail_pos.push(tail.clone());
-            }
+            expand_tail_pos(&mut all_tail_pos, &tail);
         }
     }
 
     return all_tail_pos.len();
+}
+
+fn expand_tail_pos(tail_pos_vec: &mut Vec<Point>, tail: &Point) {
+    if !tail_pos_vec.contains(tail) {
+        tail_pos_vec.push(tail.clone());
+    }
+}
+
+fn check_x_distance(head: &mut Point, tail: &mut Point) {
+    if (head.x - tail.x).abs() == 1 {
+        tail.x += head.x - tail.x;
+    }
+}
+
+fn check_y_distance(head: &mut Point, tail: &mut Point) {
+    if (head.y - tail.y).abs() == 1 {
+        tail.y += head.y - tail.y;
+    }
 }
 
 fn parse_line(line: String) -> Motion {
