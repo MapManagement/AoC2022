@@ -2,8 +2,10 @@ use std::fs::File;
 use std::io::{self, BufRead};
 
 fn main() {
-    let number = iterate_file_lines();
-    println!("{}", number);
+    let part1 = part1();
+    let part2 = part2();
+    println!("Part 1: {}", part1);
+    println!("Part 2: {}", part2);
 }
 
 struct AssignmentPair {
@@ -19,7 +21,7 @@ fn read_file_lines() -> io::Result<io::Lines<io::BufReader<File>>> {
     Ok(io::BufReader::new(input_file).lines())
 }
 
-fn iterate_file_lines() -> i32 {
+fn part1() -> i32 {
     if let Ok(lines) = read_file_lines() {
 
         let mut counter = 0;
@@ -28,6 +30,25 @@ fn iterate_file_lines() -> i32 {
             if let Ok(pair) = &line {
                 let assignment_pair = get_assigment_pair(pair);
                 if check_assignment_ranges(&assignment_pair) {
+                    counter += 1;
+                }
+            }
+        }
+
+        return counter;
+    }
+
+    return 0;
+}
+
+fn part2() -> i32 {
+    if let Ok(lines) = read_file_lines() {
+        let mut counter = 0;
+
+        for line in lines {
+            if let Ok(pair) = &line {
+                let assignment_pair = get_assigment_pair(pair);
+                if check_assignment_overlap(&assignment_pair) {
                     counter += 1;
                 }
             }
@@ -74,4 +95,18 @@ fn check_assignment_ranges(assignment_pair: &AssignmentPair) -> bool {
     return false;
 }
 
+fn check_assignment_overlap(assignment_pair: &AssignmentPair) -> bool {
+    let mut compare_vec: Vec<i32> = Vec::new();
 
+    for i in assignment_pair.start_first_elf..=assignment_pair.end_first_elf {
+        compare_vec.push(i.clone());
+    }
+
+    for j in assignment_pair.start_second_elf..=assignment_pair.end_second_elf {
+        if compare_vec.contains(&j) {
+            return true;
+        }
+    }
+
+    return false;
+}
