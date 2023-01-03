@@ -6,24 +6,22 @@ fn main() {
     println!("Part1: {}", part1);
 }
 
+#[derive(Debug)]
 struct Tile {
     x: usize,
-    y: usize
+    y: usize,
 }
 
 struct Cave {
     left_border: usize,
     right_border: usize,
     bottom_border: usize,
-    structure: Vec<Vec<String>>
+    structure: Vec<Vec<String>>,
 }
 
 fn read_file_lines() -> Vec<String> {
-    let file_content = fs::read_to_string("input")
-        .expect("Cannot read the given file");
-    let mut lines: Vec<String> = file_content.split("\n")
-        .map(str::to_string)
-        .collect();
+    let file_content = fs::read_to_string("input").expect("Cannot read the given file");
+    let mut lines: Vec<String> = file_content.split("\n").map(str::to_string).collect();
     lines.pop();
 
     lines
@@ -38,73 +36,99 @@ fn part1() -> i32 {
     sand_counter
 }
 
-fn extract_rock_tiles(rock_positions: Vec<String>) -> Vec<Tile> {
-    let mut rock_tiles: Vec<Tile> = Vec::new();
+fn extract_rock_tiles(rock_positions: Vec<String>) -> Vec<Vec<Tile>> {
+    let mut rock_tiles: Vec<Vec<Tile>> = Vec::new();
 
-    for rock_position in rock_positions {
-        let tiles = rock_position.split(" -> ").collect::<Vec<&str>>();
+    for i in 0..rock_positions.len() {
+        let tiles = rock_positions[i].split(" -> ").collect::<Vec<&str>>();
+        rock_tiles.push(Vec::new());
 
         for tile in tiles {
             let pos = tile.split(",").collect::<Vec<&str>>();
 
             let rock_tile = Tile {
                 x: pos[0].parse::<usize>().unwrap(),
-                y: pos[1].parse::<usize>().unwrap()
+                y: pos[1].parse::<usize>().unwrap(),
             };
 
-            rock_tiles.push(rock_tile);
-        }
-    }
-
-    rock_tiles
-}
-
-fn draw_cave(tiles: Vec<Tile>) -> Cave {
-    let lowest_rock = tiles.iter().max_by_key(|tile| tile.y).unwrap();
-    let left_rock = tiles.iter().min_by_key(|tile| tile.x).unwrap();
-    let right_rock = tiles.iter().max_by_key(|tile| tile.x).unwrap();
-
-    let mut cave: Vec<Vec<String>> = vec![vec![".".to_string(); right_rock.x - left_rock.x + 1]; lowest_rock.y + 1];
-
-    for i in 0..tiles.len() - 1 {
-        let x_delta = tiles[i].x.abs_diff(tiles[i + 1].x);
-        let y_delta = tiles[i].y.abs_diff(tiles[i + 1].y);
-
-        if x_delta == 0 {
-            let smaller = if tiles[i].y < tiles[i + 1].y {
-                tiles[i].y
-            } else {
-                tiles[i + 1].y
-            };
-
-            for j in 0..=y_delta {
-                cave[smaller + j][tiles[i].x - left_rock.x] = "#".to_string();
-            }
-        }
-        else if y_delta == 0 {
-            let smaller = if tiles[i].x < tiles[i + 1].x {
-                tiles[i].x
-            } else {
-                tiles[i + 1].x
-            };
-
-            for j in 0..=x_delta {
-                cave[tiles[i].y][smaller + j - left_rock.x] = "#".to_string();
-            }
+            rock_tiles[i].push(rock_tile);
         }
     }
     
-    Cave {
-        left_border: left_rock.x,
-        right_border: right_rock.x,
-        bottom_border: lowest_rock.y,
-        structure: cave
+    rock_tiles
+}
+
+fn draw_cave(tiles: Vec<Vec<Tile>>) -> Cave {
+    let (left_border, right_border, ground) = find_cave_borders(&tiles);
+
+    let mut cave: Vec<Vec<String>> =
+        vec![vec![".".to_string(); right_border - left_border + 1]; ground + 1];
+    for tile_structure in tiles {
+        for i in 0..tile_structure.len() - 1 {
+            let x_delta = tile_structure[i].x.abs_diff(tile_structure[i + 1].x);
+            let y_delta = tile_structure[i].y.abs_diff(tile_structure[i + 1].y);
+
+            if x_delta == 0 {
+                let smaller = if tile_structure[i].y < tile_structure[i + 1].y {
+                    tile_structure[i].y
+                } else {
+                    tile_structure[i + 1].y
+                };
+
+                for j in 0..=y_delta {
+                    cave[smaller + j][tile_structure[i].x - left_border] = "#".to_string();
+                }
+            } else if y_delta == 0 {
+                let smaller = if tile_structure[i].x < tile_structure[i + 1].x {
+                    tile_structure[i].x
+                } else {
+                    tile_structure[i + 1].x
+                };
+
+                for j in 0..=x_delta {
+                    cave[tile_structure[i].y][smaller + j - left_border] = "#".to_string();
+                }
+            }
+        }
     }
+
+    Cave {
+        left_border: left_border,
+        right_border: right_border,
+        bottom_border: ground,
+        structure: cave,
+    }
+}
+
+fn find_cave_borders(tiles: &Vec<Vec<Tile>>) -> (usize, usize, usize) {
+    let mut left_border = 0;
+    let mut right_border = 0;
+    let mut ground = 0;
+
+    for tile_structure in tiles {
+        for tile in tile_structure {
+            if tile.x > right_border {
+                right_border = tile.x;
+            }
+            else if tile.x < left_border {
+                left_border = tile.x;
+            }
+
+            if tile.y > ground {
+                ground = tile.y;
+            }
+        }
+    }
+
+    (left_border, right_border, ground)
 }
 
 fn start_sand_dropping(mut cave: Cave) -> i32 {
     let mut is_flowing_out = false;
-    let start = Tile { x: 500 - cave.left_border, y: 0 };
+    let start = Tile {
+        x: 500 - cave.left_border,
+        y: 0,
+    };
     let mut sand_counter = 0;
 
     while !is_flowing_out {
@@ -112,30 +136,34 @@ fn start_sand_dropping(mut cave: Cave) -> i32 {
         let mut sand_y = start.y;
 
         loop {
-            if sand_y == cave.bottom_border || sand_x == 0 || sand_x == cave.right_border - cave.left_border {
+            if sand_y == cave.bottom_border || sand_x == 0 {
                 is_flowing_out = true;
                 break;
             }
 
             if cave.structure[sand_y + 1][sand_x] == ".".to_string() {
                 sand_y += 1;
+                continue;
             }
-            else {
-                if cave.structure[sand_y + 1][sand_x - 1] == ".".to_string() {
-                    sand_y += 1;
-                    sand_x -= 1;
-                }
-                else {
-                    if cave.structure[sand_y + 1][sand_x + 1] == ".".to_string() {
-                        sand_y += 1;
-                        sand_x += 1;
-                    }
-                    else {
-                        cave.structure[sand_y][sand_x] = "O".to_string();
-                        sand_counter += 1;
-                        break;
-                    }
-                }
+
+            if cave.structure[sand_y + 1][sand_x - 1] == ".".to_string() {
+                sand_y += 1;
+                sand_x -= 1;
+                continue;
+            }
+
+            if sand_x == cave.right_border - cave.left_border {
+                is_flowing_out = true;
+                break;
+            }
+
+            if cave.structure[sand_y + 1][sand_x + 1] == ".".to_string() {
+                sand_y += 1;
+                sand_x += 1;
+            } else {
+                cave.structure[sand_y][sand_x] = "O".to_string();
+                sand_counter += 1;
+                break;
             }
         }
     }
