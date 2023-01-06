@@ -19,6 +19,12 @@ struct Cave {
     structure: Vec<Vec<String>>,
 }
 
+enum SandState {
+    Falling,
+    Resting,
+    Flowing
+}
+
 fn read_file_lines() -> Vec<String> {
     let file_content = fs::read_to_string("input").expect("Cannot read the given file");
     let mut lines: Vec<String> = file_content.split("\n").map(str::to_string).collect();
@@ -54,7 +60,7 @@ fn extract_rock_tiles(rock_positions: Vec<String>) -> Vec<Vec<Tile>> {
             rock_tiles[i].push(rock_tile);
         }
     }
-    
+
     rock_tiles
 }
 
@@ -93,8 +99,8 @@ fn draw_cave(tiles: Vec<Vec<Tile>>) -> Cave {
     }
 
     Cave {
-        left_border: left_border,
-        right_border: right_border,
+        left_border,
+        right_border,
         bottom_border: ground,
         structure: cave,
     }
@@ -109,8 +115,7 @@ fn find_cave_borders(tiles: &Vec<Vec<Tile>>) -> (usize, usize, usize) {
         for tile in tile_structure {
             if tile.x > right_border {
                 right_border = tile.x;
-            }
-            else if tile.x < left_border {
+            } else if tile.x < left_border {
                 left_border = tile.x;
             }
 
@@ -136,37 +141,54 @@ fn start_sand_dropping(mut cave: Cave) -> i32 {
         let mut sand_y = start.y;
 
         loop {
-            if sand_y == cave.bottom_border || sand_x == 0 {
-                is_flowing_out = true;
-                break;
-            }
+            let state = check_sand_underground(&mut cave, &mut sand_x, &mut sand_y);
 
-            if cave.structure[sand_y + 1][sand_x] == ".".to_string() {
-                sand_y += 1;
-                continue;
-            }
-
-            if cave.structure[sand_y + 1][sand_x - 1] == ".".to_string() {
-                sand_y += 1;
-                sand_x -= 1;
-                continue;
-            }
-
-            if sand_x == cave.right_border - cave.left_border {
-                is_flowing_out = true;
-                break;
-            }
-
-            if cave.structure[sand_y + 1][sand_x + 1] == ".".to_string() {
-                sand_y += 1;
-                sand_x += 1;
-            } else {
-                cave.structure[sand_y][sand_x] = "O".to_string();
-                sand_counter += 1;
-                break;
+            match state {
+                SandState::Falling => { continue; },
+                SandState::Resting => {
+                    sand_counter += 1;
+                    break;
+                },
+                SandState::Flowing => {
+                    is_flowing_out = true;
+                    break;
+                }
             }
         }
     }
 
     sand_counter
+}
+
+fn check_sand_underground(cave: &mut Cave, sand_x: &mut usize, sand_y: &mut usize) -> SandState {
+    let y = *sand_y;
+    let x = *sand_x;
+
+    if y == cave.bottom_border || x == 0 {
+        return SandState::Flowing;
+    }
+
+    if cave.structure[y + 1][x] == ".".to_string() {
+        *sand_y += 1;
+        return SandState::Falling;
+    }
+
+    if cave.structure[y + 1][x - 1] == ".".to_string() {
+        *sand_y += 1;
+        *sand_x -= 1;
+        return SandState::Falling;
+    }
+
+    if x == cave.right_border - cave.left_border {
+        return SandState::Flowing;
+    }
+
+    if cave.structure[y + 1][x + 1] == ".".to_string() {
+        *sand_y += 1;
+        *sand_x += 1;
+        return SandState::Falling;
+    } else {
+        cave.structure[y][x] = "O".to_string();
+        return SandState::Resting;
+    }
 }
